@@ -1,0 +1,206 @@
+<html>
+
+<head>
+    <title>My first Vue app</title>
+</head>
+
+<body>
+    <div id="app">
+        <router-view :key="$route.path"></router-view>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/2.0.1/vue-router.js"></script>
+    <script>
+        const routes = [
+            {
+                path: '/login',
+                component: {
+                    data() {
+                        return {
+                            input: {
+                                username: "",
+                                password: ""
+                            }
+                        }
+                    },
+                    methods: {
+                        login() {
+                            this.$router.push('/dashboard')
+                        }
+                    },
+                    template: `
+                        <div id="login">
+                            <h1>Login</h1>
+                            <input type="text" name="username" v-model="input.username" placeholder="Username" />
+                            <input type="password" name="password" v-model="input.password" placeholder="Password" />
+                            <button type="button" v-on:click="login()">Login</button>
+                            <br/>
+                            <router-link to="/register">Register</router-link>
+                        </div>
+                    `
+                }
+            },
+            {
+                path: '/register',
+                component: {
+                    data() {
+                        return {
+                            input: {
+                                username: "",
+                                password: "",
+                                confirmPassword: ""
+                            }
+                        }
+                    },
+                    methods: {
+                        register() {
+                            this.$router.push('/dashboard')
+                        }
+                    },
+                    template: `
+                        <div id="register">
+                            <h1>Register</h1>
+                            <input type="text" name="username" v-model="input.username" placeholder="Username" />
+                            <input type="password" name="password" v-model="input.password" placeholder="Password" />
+                            <input type="password" name="confirmPassword" v-model="input.confirmPassword" placeholder="Confirm Password" />
+                            <button type="button" v-on:click="login()">Register</button>
+                            <br/>
+                            <router-link to="/login">Login</router-link>
+                        </div>
+                    `
+                }
+            },
+            {
+                path: '/dashboard',
+                component: {
+                    created() {
+                        var usersList = [
+                            {
+                                "name": "jagaprabu",
+				"age": "20",
+				"DoB": "27.12.2000",
+                                "gender": "male",
+                                "company": "OPTYK",
+                                "email": "crystalvang@optyk.com",
+                                "phone": "+1 (963) 572-3918"
+                            },
+                            {
+                                "name": "harish",
+				"age": "28",
+				"DoB": "11.4.1996",
+                                "gender": "male",
+                                "company": "RAMEON",
+                                "email": "harish@rameon.com",
+                                "phone": "+1 (904) 520-3887"
+                            },
+                            {
+                                "name": "swetha",
+				"age": "20",
+				"DoB": "17.6.2001",
+                                "gender": "female",
+                                "company": "GEEKNET",
+                                "email": "swetha@geeknet.com",
+                                "phone": "+1 (859) 519-2963"
+                            },
+                            {
+                                "name": "Linda",
+				"age": "24",
+				"DoB": "20.7.1998",
+                                "gender": "female",
+                                "company": "ENDICIL",
+                                "email": "linda@endicil.com",
+                                "phone": "+1 (855) 572-2177"
+                            },
+                            {
+                                "name": "Willis",
+				"age": "27",
+				"DoB": "1.5.1990",
+                                "gender": "male",
+                                "company": "QUIZMO",
+                                "email": "willis@quizmo.com",
+                                "phone": "+1 (909) 419-3480"
+                            },
+                            {
+                                "name": "Stephens",
+				"age": "21",
+				"DoB": "5.6.2000",
+                                "gender": "male",
+                                "company": "ZAPHIRE",
+                                "email": "stephens@zaphire.com",
+                                "phone": "+1 (985) 450-3125"
+                            }
+                        ];
+                        localStorage.usersList = JSON.stringify(usersList);
+                    },
+                    methods: {
+                        getUserList() {
+                            return JSON.parse(localStorage.usersList);;
+                        }
+                    },
+                    template: `
+                        <div id="dashboard">
+                            <router-link to="/login">Logout</router-link>
+                            <h1>Dashboard</h1>
+                            <ul>
+                                <li v-for="(item, index) in getUserList()">
+                                    <router-link :to="'/user/' + index">{{ item.name }}</router-link>
+                                </li>
+                            </ul>
+                        </div>
+                    `
+                }
+            },
+            {
+                path: '/user/:id',
+                component: {
+                    data() {
+                        return {
+                            user: {},
+                            id: 0,
+                            nextAvailable: false,
+                            prevAvailable: false
+                        }
+                    },
+                    mounted() {
+                        var userList = JSON.parse(localStorage.usersList);
+                        this.id = parseInt(this.$route.params.id);
+                        this.user = userList[this.id];
+                        this.nextAvailable = this.id + 1 < userList.length;
+                        this.prevAvailable = this.id - 1 >= 0;
+                    },
+                    template: `
+                        <div id="user">
+                             <router-link to="/dashboard">Dashboard</router-link>
+                             <router-link to="/login">Logout</router-link>
+                             <h1>User Info</h1>
+                             <p>Name: {{user.name}}</p>
+			     <p>age: {{user.age}}</p>
+			     <p>DoB: {{user.DoB}}</p>
+                             <p>Gender: {{user.gender}}</p>
+                             <p>Company: {{user.company}}</p>
+                             <p>Email: {{user.email}}</p>
+                             <p>Phone: {{user.phone}}</p>
+
+                             <router-link :to="'/user/' + (id - 1)" v-if="prevAvailable">Previous</router-link>
+                             <router-link :to="'/user/' + (id + 1)" v-if="nextAvailable">Next</router-link>
+                        </div>
+                            
+                    `
+                }
+            },
+            {
+                path: '/',
+                redirect: '/login'
+            }
+        ];
+
+        const router = new VueRouter({ routes });
+
+        const app = new Vue({
+            el: '#app',
+            router: router
+        })
+    </script>
+</body>
+
+</html>
